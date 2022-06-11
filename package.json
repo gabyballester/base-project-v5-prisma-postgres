@@ -7,9 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "prisma:dev:deploy": "prisma migrate deploy",
-    "prisma:test:deploy": "dotenv -e .env.test -- prisma migrate deploy",
     "db:dev:restart": "yarn prisma:dev:deploy",
-    "db:test:restart": "yarn prisma:test:deploy",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",

@@ -11,9 +11,11 @@ import {
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { User } from '@prisma/client';
 import { JwtAuthGuard } from 'src/auth/guards';
+import { GetUser } from 'src/auth/decorator';
 
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly _userService: UserService) {}
@@ -24,14 +26,14 @@ export class UserController {
   }
 
   @Get('')
-  @UseGuards(JwtAuthGuard)
   findAll() {
     return this._userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this._userService.findOne(+id);
+  findOne(@GetUser('id') userId: User) {
+    console.log(userId);
+    return this._userService.findOne(+userId);
   }
 
   @Patch(':id')

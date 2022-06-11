@@ -5,6 +5,8 @@ import { SignInDto, SignUpDto } from './dto';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { key } from 'src/common/enum';
+import { getConst } from 'src/common/functions';
 
 @Injectable()
 export class AuthService {
@@ -24,6 +26,7 @@ export class AuthService {
           hash,
         },
       });
+      
       return this.signToken(user.id, user.email);
     } catch (error) {
       if (error instanceof PrismaClientKnownRequestError) {
@@ -61,16 +64,16 @@ export class AuthService {
       sub: userId,
       email,
     };
-    const secret = this._configService.get('JWT_SECRET');
+    const secret = this._configService.get(key.JWT_SECRET);
 
     const [access_token, refresh_token] = await Promise.all([
       this._jwtService.signAsync(jwtPayload, {
         secret,
-        expiresIn: '15m',
+        expiresIn: getConst(key.AT_EXPIRATION),
       }),
       this._jwtService.signAsync(jwtPayload, {
         secret,
-        expiresIn: '7d',
+        expiresIn: getConst(key.RT_EXPIRATION),
       }),
     ]);
 
