@@ -1,0 +1,17 @@
+SUPERADMIN
+- Create users (any role)
+- Get users / get by id
+- Patch Users
+- Delete Users
+
+
+ADMIN
+- Create users (only user role)
+- Get users / get by id
+- Patch Users (except admin)
+- Delete Users (except admin)
+
+User
+- Get users / get by id
+- Patch users (their own user)
+- Delete users (their own user)

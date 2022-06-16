@@ -3,6 +3,7 @@ export enum key {
   JWT = 'JWT',
   AT_EXPIRATION = 'AT_EXPIRATION',
   RT_EXPIRATION = 'RT_EXPIRATION',
+  ROLES = 'roles',
 }
 
 export enum db {
