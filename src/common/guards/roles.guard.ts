@@ -9,7 +9,7 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import { Request } from 'express';
-import { key } from '../enum';
+import { key } from 'src/common/enum';
 import { JwtDecodeResponse } from '../interfaces';
 
 @Injectable()

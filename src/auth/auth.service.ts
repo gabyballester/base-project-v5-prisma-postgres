@@ -8,12 +8,9 @@ import { Prisma, User } from '@prisma/client';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { key } from 'src/common/enum';
-import { SignInDto } from '../common/dto';
+import { SignInDto } from 'src/common/dto';
 import { UserService } from '../user/user.service';
-import {
-  getEnvConst,
-  verifyPass,
-} from 'src/common/functions';
+import { verifyPass } from 'src/common/functions';
 import { IAuthToken } from 'src/common/interfaces';
 
 @Injectable()

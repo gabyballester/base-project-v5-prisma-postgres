@@ -1,5 +1,4 @@
 import {
-  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -11,7 +10,7 @@ import {
 } from 'passport-jwt';
 import { key } from 'src/common/enum';
 import { PrismaService } from '../../prisma/prisma.service';
-import { getEnvConst } from '../../common/functions/get-env-const.function';
+import { getEnvConst } from 'src/common/functions';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(
@@ -46,6 +45,7 @@ export class JwtStrategy extends PassportStrategy(
       throw new UnauthorizedException();
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...restUser } = user;
 
     return restUser;

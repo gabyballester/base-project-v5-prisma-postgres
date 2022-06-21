@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Prisma, Role } from '@prisma/client';
@@ -16,7 +15,6 @@ import {
   Public,
   Roles,
 } from 'src/common/decorators';
-import { JwtAuthGuard } from 'src/common/guards';
 
 @Controller('users')
 export class UserController {
