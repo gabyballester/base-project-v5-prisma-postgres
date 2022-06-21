@@ -2,22 +2,19 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
-  InternalServerErrorException,
-  NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma, User } from '@prisma/client';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { key } from 'src/common/enum';
-import {
-  createHash,
-  getConst,
-  verifyHash,
-} from 'src/common/functions';
-import { SignInDto } from './dto/signIn.dto';
+import { SignInDto } from '../common/dto';
 import { UserService } from '../user/user.service';
+import {
+  getEnvConst,
+  verifyPass,
+} from 'src/common/functions';
+import { IAuthToken } from 'src/common/interfaces';
 
 @Injectable()
 export class AuthService {
@@ -28,60 +25,51 @@ export class AuthService {
     private readonly _userService: UserService,
   ) {}
 
-  async signUp(dto: Prisma.UserCreateInput) {
-    try {
-      const emailExists =
-        await this._userService.findByEmail(
-          dto.email,
-        );
-
-      if (emailExists)
-        throw new BadRequestException(
-          'Email taken',
-        );
-
-      const usernameExists =
-        await this._userService.findByUsername(
-          dto.username,
-        );
-
-      if (usernameExists)
-        throw new BadRequestException(
-          'Username taken',
-        );
-
-      const user =
-        await this._prismaService.user.create({
-          data: {
-            ...dto,
-            password: await createHash(dto),
-          },
-        });
-
-      if (!user) {
-        throw new BadRequestException(
-          'User not created',
-        );
-      }
-
-      return this.signToken(user);
-    } catch (error) {
-      if (
-        error instanceof
-        PrismaClientKnownRequestError
-      ) {
-        if (error.code === 'P2002') {
-          // duplicate code
-          throw new ForbiddenException(
-            'Credentials taken',
-          );
-        }
-      }
-      throw error;
+  async signUp(
+    dto: Prisma.UserCreateInput,
+  ): Promise<IAuthToken> {
+    if (
+      await this._userService.findByEmail(
+        dto.email,
+      )
+    ) {
+      throw new BadRequestException(
+        'Email taken',
+      );
     }
-  }
 
-  async signIn(dto: SignInDto) {
+    if (
+      await this._userService.findByUsername(
+        dto.username,
+      )
+    ) {
+      throw new BadRequestException(
+        'Username taken',
+      );
+    }
+
+    const createdUser =
+      await this._userService.saveUserOnDatabate(
+        dto,
+      );
+    if (!createdUser)
+      throw new BadRequestException(
+        'User not created',
+      );
+
+    const isUser = await this.signToken(
+      createdUser,
+    );
+    if (!isUser) {
+      throw new BadRequestException(
+        'User not created',
+      );
+    }
+    return isUser;
+  }
+  async signIn(
+    dto: SignInDto,
+  ): Promise<IAuthToken> {
     const user =
       await this._prismaService.user.findUnique({
         where: {
@@ -94,7 +82,7 @@ export class AuthService {
         'Email not found',
       );
 
-    const pwMatches = await verifyHash(
+    const pwMatches = await verifyPass(
       user.password,
       dto.password,
     );
@@ -106,11 +94,9 @@ export class AuthService {
     return this.signToken(user);
   }
 
-  async signToken(user: User): Promise<{
-    access_token: string;
-    refresh_token: string;
-    userData: User;
-  }> {
+  async signToken(
+    user: User,
+  ): Promise<IAuthToken> {
     const { id, email, roles } = user;
     const jwtPayload = {
       sub: id,
@@ -126,7 +112,7 @@ export class AuthService {
         jwtPayload,
         {
           secret,
-          expiresIn: getConst(key.AT_EXPIRATION),
+          expiresIn: key.ACCESS_TOKEN_EXPIRATION,
         },
       );
 
@@ -135,7 +121,7 @@ export class AuthService {
         jwtPayload,
         {
           secret,
-          expiresIn: getConst(key.RT_EXPIRATION),
+          expiresIn: key.REFRESH_TOKEN_EXPIRATION,
         },
       );
 

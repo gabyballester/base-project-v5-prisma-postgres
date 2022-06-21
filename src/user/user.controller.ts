@@ -7,46 +7,38 @@ import {
   Param,
   Delete,
   UseGuards,
-  ConflictException,
-  InternalServerErrorException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Prisma, Role } from '@prisma/client';
-import { JwtAuthGuard } from 'src/auth/guards';
-import { GetUser } from 'src/auth/decorator';
-import { Roles } from './roles.decorator';
 
-@UseGuards(JwtAuthGuard)
-@Roles(Role.ADMIN)
+import {
+  GetUser,
+  Public,
+  Roles,
+} from 'src/common/decorators';
+import { JwtAuthGuard } from 'src/common/guards';
+
 @Controller('users')
 export class UserController {
   constructor(
     private readonly _userService: UserService,
   ) {}
 
+  @Roles(Role.ADMIN, Role.SUPERADMIN)
   @Post()
   create(
     @Body() dto: Prisma.UserUncheckedCreateInput,
   ) {
-    try {
-      return this._userService.create(dto);
-    } catch (error) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        throw new ConflictException(
-          'This email is already registered',
-        );
-      }
-      throw new InternalServerErrorException(
-        'server error',
-      );
-    }
+    return this._userService.create(dto);
   }
 
+  @Public()
   @Get()
   findAll() {
     return this._userService.findAll();
   }
 
+  @Public()
   @Get(':id')
   findOne(
     @GetUser('id')

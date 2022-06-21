@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -10,12 +11,12 @@ import {
 } from 'passport-jwt';
 import { key } from 'src/common/enum';
 import { PrismaService } from '../../prisma/prisma.service';
-import { getConst } from '../../common/functions/index';
+import { getEnvConst } from '../../common/functions/get-env-const.function';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(
   Strategy,
-  getConst(key.JWT),
+  getEnvConst(key.JWT),
 ) {
   constructor(
     _configService: ConfigService,
@@ -44,7 +45,9 @@ export class JwtStrategy extends PassportStrategy(
     if (!user) {
       throw new UnauthorizedException();
     }
-    delete user.password;
-    return user;
+
+    const { password, ...restUser } = user;
+
+    return restUser;
   }
 }

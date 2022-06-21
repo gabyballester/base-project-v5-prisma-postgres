@@ -9,8 +9,8 @@ import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import { Request } from 'express';
-import { key } from '../common/enum/index';
-import { JwtDecodeResponse } from './jwt-decode.interface';
+import { key } from '../enum';
+import { JwtDecodeResponse } from '../interfaces';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -38,14 +38,27 @@ export class RolesGuard implements CanActivate {
     const request: Request = context
       .switchToHttp()
       .getRequest();
+
+    const hasBearer =
+      request.headers.authorization?.split(
+        'Bearer',
+      )[1];
+    if (hasBearer === undefined) {
+      throw new UnauthorizedException(
+        'Token not valid, loggin apaing',
+      );
+    }
+
     const user = (await this._jwtService.decode(
       request.headers.authorization
         ?.split('Bearer')[1]
         .trim() as string,
     )) as JwtDecodeResponse;
 
-    if (!user.roles) {
-      throw new UnauthorizedException();
+    if (user === null || !user.roles) {
+      throw new UnauthorizedException(
+        'You must be logged in (role checker2)',
+      );
     }
 
     const hasRole = () =>
