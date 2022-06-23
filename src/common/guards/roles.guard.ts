@@ -45,7 +45,7 @@ export class RolesGuard implements CanActivate {
       )[1];
     if (hasBearer === undefined) {
       throw new UnauthorizedException(
-        'Token not valid, loggin apaing',
+        'Token not valid, loggin again',
       );
     }
 

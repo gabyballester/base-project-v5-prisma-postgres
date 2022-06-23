@@ -3,6 +3,7 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Prisma, User } from '@prisma/client';
+import { UpdateUserDto } from 'src/common/dto/user/update-user.dto';
 import { Role } from 'src/common/enum';
 import {
   encodePass,
@@ -69,7 +70,7 @@ export class UserService {
     }
 
     const createdUser =
-      this.saveUserOnDatabate(dto);
+      await this.saveUserOnDatabate(dto);
     if (!createdUser)
       throw new BadRequestException(
         'User not created',
@@ -81,35 +82,50 @@ export class UserService {
     return this._prismaService.user.findMany();
   }
 
-  // async findOne(
-  //   id: string,
-  // ): Promise<User> {
-  //   const isUser =
-  //     await this._prismaService.user.findUnique({
-  //       where: id,
-  //     });
-  //   if (!isUser) {
-  //     throw new BadRequestException(
-  //       'User does not exist',
-  //     );
-  //   }
-  //   return isUser;
-  // }
+  async findOne(id: Prisma.UserWhereUniqueInput) {
+    const user =
+      await this._prismaService.user.findUnique({
+        where: id,
+      });
 
-  findOne(id: Prisma.UserWhereUniqueInput) {
-    return this._prismaService.user.findUnique({
-      where: id,
-    });
+    if (!user) {
+      throw new BadRequestException(
+        'User does not exist',
+      );
+    }
+    return user;
   }
 
-  update(
+  // update(
+  //   id: Prisma.UserWhereUniqueInput,
+  //   dto: Prisma.UserUpdateInput,
+  // ) {
+  //   return this._prismaService.user.update({
+  //     where: id,
+  //     data: dto,
+  //   });
+  // }
+
+  async update(
     id: Prisma.UserWhereUniqueInput,
     dto: Prisma.UserUpdateInput,
   ) {
-    return this._prismaService.user.update({
-      where: id,
-      data: dto,
+    await this.findOne({
+      id: +id,
     });
+
+    const user =
+      await this._prismaService.user.update({
+        where: { id: +id },
+        data: dto,
+      });
+
+    if (!user) {
+      throw new BadRequestException(
+        'User not updated',
+      );
+    }
+    return user;
   }
 
   async remove(id: Prisma.UserWhereUniqueInput) {
