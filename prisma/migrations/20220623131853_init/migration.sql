@@ -7,12 +7,13 @@ CREATE TABLE "users" (
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "hash" TEXT NOT NULL,
+    "hash" TEXT,
     "firstName" TEXT,
     "lastName" TEXT,
+    "active" BOOLEAN NOT NULL DEFAULT false,
+    "roles" "Role"[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "roles" "Role"[],
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
