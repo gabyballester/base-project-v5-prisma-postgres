@@ -3,18 +3,14 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
+  Put,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { Prisma, Role } from '@prisma/client';
-
-import {
-  GetUser,
-  Public,
-  Roles,
-} from 'src/common/decorators';
+import { Prisma } from '@prisma/client';
+import { Public } from 'src/common/decorators';
+import { UpdateUserDto } from 'src/common/dto';
 
 @Controller('users')
 export class UserController {
@@ -22,44 +18,48 @@ export class UserController {
     private readonly _userService: UserService,
   ) {}
 
-  @Roles(Role.ADMIN, Role.SUPERADMIN)
+  @Public()
   @Post()
-  create(
+  async create(
     @Body() dto: Prisma.UserUncheckedCreateInput,
   ) {
-    return this._userService.create(dto);
+    return await this._userService.create(dto);
   }
 
   @Public()
   @Get()
-  findAll() {
-    return this._userService.findAll();
+  async findAll() {
+    return await this._userService.findAll();
   }
 
   @Public()
   @Get(':id')
-  findOne(
-    @GetUser('id')
-    userId: Prisma.UserWhereUniqueInput,
+  async findOne(
+    @Param('id') id: Prisma.UserWhereUniqueInput,
   ) {
-    return this._userService.findOne({
-      id: +userId,
+    return await this._userService.findOne({
+      id: +id,
     });
   }
 
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() dto: Prisma.UserUpdateInput,
+  @Public()
+  @Put(':id')
+  async update(
+    @Param('id')
+    id: Prisma.UserWhereUniqueInput,
+    @Body() dto: UpdateUserDto,
   ) {
-    return this._userService.update(
-      { id: +id },
+    return await this._userService.update(
+      id,
       dto,
     );
   }
 
+  @Public()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this._userService.remove({ id: +id });
+  async remove(
+    @Param('id') id: Prisma.UserWhereUniqueInput,
+  ) {
+    return await this._userService.remove(id);
   }
 }
