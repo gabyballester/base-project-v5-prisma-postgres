@@ -18,27 +18,31 @@ export class UserController {
     private readonly _userService: UserService,
   ) {}
 
+  @Public()
   @Post()
-  create(
+  async create(
     @Body() dto: Prisma.UserUncheckedCreateInput,
   ) {
-    return this._userService.create(dto);
+    return await this._userService.create(dto);
   }
 
   @Public()
   @Get()
-  findAll() {
-    return this._userService.findAll();
+  async findAll() {
+    return await this._userService.findAll();
   }
 
   @Public()
   @Get(':id')
-  findOne(
+  async findOne(
     @Param('id') id: Prisma.UserWhereUniqueInput,
   ) {
-    return this._userService.findOne({ id: +id });
+    return await this._userService.findOne({
+      id: +id,
+    });
   }
 
+  @Public()
   @Put(':id')
   async update(
     @Param('id')
@@ -51,8 +55,11 @@ export class UserController {
     );
   }
 
+  @Public()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this._userService.remove({ id: +id });
+  async remove(
+    @Param('id') id: Prisma.UserWhereUniqueInput,
+  ) {
+    return await this._userService.remove(id);
   }
 }

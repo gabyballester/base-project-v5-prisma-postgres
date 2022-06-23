@@ -75,11 +75,12 @@ export class UserService {
       throw new BadRequestException(
         'User not created',
       );
+
     return createdUser;
   }
 
-  findAll() {
-    return this._prismaService.user.findMany();
+  async findAll() {
+    return await this._prismaService.user.findMany();
   }
 
   async findOne(id: Prisma.UserWhereUniqueInput) {
@@ -96,16 +97,6 @@ export class UserService {
     return user;
   }
 
-  // update(
-  //   id: Prisma.UserWhereUniqueInput,
-  //   dto: Prisma.UserUpdateInput,
-  // ) {
-  //   return this._prismaService.user.update({
-  //     where: id,
-  //     data: dto,
-  //   });
-  // }
-
   async update(
     id: Prisma.UserWhereUniqueInput,
     dto: Prisma.UserUpdateInput,
@@ -114,25 +105,37 @@ export class UserService {
       id: +id,
     });
 
-    const user =
+    const userUpdated =
       await this._prismaService.user.update({
         where: { id: +id },
         data: dto,
       });
 
-    if (!user) {
+    if (!userUpdated) {
       throw new BadRequestException(
         'User not updated',
       );
     }
-    return user;
+
+    return {
+      message: 'User updated',
+      data: userUpdated,
+    };
   }
 
   async remove(id: Prisma.UserWhereUniqueInput) {
-    await this.findOne(id);
-
-    return this._prismaService.user.delete({
-      where: id,
+    await this.findOne({
+      id: +id,
     });
+
+    const userDeleted =
+      await this._prismaService.user.delete({
+        where: { id: +id },
+      });
+
+    return {
+      message: 'User deleted',
+      data: userDeleted,
+    };
   }
 }
