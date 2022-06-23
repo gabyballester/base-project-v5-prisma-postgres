@@ -10,13 +10,11 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Prisma, Role } from '@prisma/client';
-
 import {
   GetUser,
   Public,
   Roles,
 } from 'src/common/decorators';
-import { JwtAuthGuard } from 'src/common/guards';
 
 @Controller('users')
 export class UserController {
@@ -39,14 +37,18 @@ export class UserController {
   }
 
   @Public()
+  // @Get(':id')
+  // findOne(
+  //   // @GetUser('id')
+  //   id: number,
+  // ) {
+  //   return this._userService.findOne({
+  //     id: id,
+  //   });
+  // }
   @Get(':id')
-  findOne(
-    @GetUser('id')
-    userId: Prisma.UserWhereUniqueInput,
-  ) {
-    return this._userService.findOne({
-      id: +userId,
-    });
+  findOne(@Param('id') id: string) {
+    return this._userService.findOne({ id: +id });
   }
 
   @Patch(':id')

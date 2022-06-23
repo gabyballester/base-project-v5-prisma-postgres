@@ -81,19 +81,25 @@ export class UserService {
     return this._prismaService.user.findMany();
   }
 
-  async findOne(
-    id: Prisma.UserWhereUniqueInput,
-  ): Promise<User> {
-    const isUser =
-      await this._prismaService.user.findUnique({
-        where: id,
-      });
-    if (!isUser) {
-      throw new BadRequestException(
-        'User does not exist',
-      );
-    }
-    return isUser;
+  // async findOne(
+  //   id: string,
+  // ): Promise<User> {
+  //   const isUser =
+  //     await this._prismaService.user.findUnique({
+  //       where: id,
+  //     });
+  //   if (!isUser) {
+  //     throw new BadRequestException(
+  //       'User does not exist',
+  //     );
+  //   }
+  //   return isUser;
+  // }
+
+  findOne(id: Prisma.UserWhereUniqueInput) {
+    return this._prismaService.user.findUnique({
+      where: id,
+    });
   }
 
   update(
@@ -113,5 +119,4 @@ export class UserService {
       where: id,
     });
   }
-  
 }
