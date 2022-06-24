@@ -8,9 +8,10 @@ export enum key {
   REFRESH_TOKEN_EXPIRATION = '7d',
 }
 
-export enum Role {
-  VISITOR = 'VISITOR',
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-  SUPERADMIN = 'SUPERADMIN',
+export enum AbilityAction {
+  MANAGE = 'manage',
+  CREATE = 'create',
+  READ = 'read',
+  UPDATE = 'update',
+  DELETE = 'delete',
 }

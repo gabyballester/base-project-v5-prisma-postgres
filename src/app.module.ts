@@ -10,6 +10,7 @@ import {
   RolesGuard,
   JwtAuthGuard,
 } from 'src/common/guards';
+import { AbilityModule } from './ability/ability.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import {
     AuthModule,
     UserModule,
     PrismaModule,
+    AbilityModule,
   ],
   controllers: [],
   providers: [

@@ -2,9 +2,12 @@ import {
   BadRequestException,
   Injectable,
 } from '@nestjs/common';
-import { Prisma, User } from '@prisma/client';
-import { UpdateUserDto } from 'src/common/dto/user/update-user.dto';
-import { Role } from 'src/common/enum';
+import {
+  Prisma,
+  Role,
+  User,
+} from '@prisma/client';
+
 import {
   encodePass,
   generateHash,

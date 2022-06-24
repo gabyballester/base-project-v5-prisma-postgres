@@ -6,33 +6,44 @@ import {
   Param,
   Delete,
   Put,
+  ForbiddenException,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Prisma } from '@prisma/client';
-import { Public } from 'src/common/decorators';
-import { UpdateUserDto } from 'src/common/dto';
+import {
+  GetUser,
+  Public,
+} from 'src/common/decorators';
+import { UpdateUserDto } from 'src/common/dto/user/update-user.dto';
+import { AbilityFactory } from '../ability/ability.factory';
+import { UserEntity } from './user.entity';
 
 @Controller('users')
 export class UserController {
   constructor(
     private readonly _userService: UserService,
+    private readonly _abilityFactory: AbilityFactory,
   ) {}
 
-  @Public()
+  // @Public()
   @Post()
   async create(
+    @GetUser() user: UserEntity,
     @Body() dto: Prisma.UserUncheckedCreateInput,
   ) {
+    this._abilityFactory.checkAbility({
+      entity: user,
+      entityType: UserEntity,
+      message: `Only admins can create!!`,
+    });
     return await this._userService.create(dto);
   }
 
-  @Public()
   @Get()
   async findAll() {
     return await this._userService.findAll();
   }
 
-  @Public()
   @Get(':id')
   async findOne(
     @Param('id') id: Prisma.UserWhereUniqueInput,
@@ -42,7 +53,6 @@ export class UserController {
     });
   }
 
-  @Public()
   @Put(':id')
   async update(
     @Param('id')
@@ -55,7 +65,6 @@ export class UserController {
     );
   }
 
-  @Public()
   @Delete(':id')
   async remove(
     @Param('id') id: Prisma.UserWhereUniqueInput,
