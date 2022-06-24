@@ -10,13 +10,13 @@ import { key } from 'src/common/enum';
 export class JwtAuthGuard extends AuthGuard(
   key.JWT,
 ) {
-  constructor(private reflector: Reflector) {
+  constructor(private _reflector: Reflector) {
     super();
   }
 
   canActivate(context: ExecutionContext) {
     const isPublic =
-      this.reflector.getAllAndOverride<any>(
+      this._reflector.getAllAndOverride<any>(
         key.IS_PUBLIC,
         [
           context.getHandler(),

@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import {
   RolesGuard,
   JwtAuthGuard,
+  UserIntegrityGuard,
 } from 'src/common/guards';
 import { AbilityModule } from './ability/ability.module';
 
@@ -30,6 +31,10 @@ import { AbilityModule } from './ability/ability.module';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: UserIntegrityGuard,
     },
   ],
 })

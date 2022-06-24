@@ -24,7 +24,7 @@ export type AppAbility = Ability<
 
 @Injectable()
 export class AbilityFactory {
-  defineAbility(user: User, message) {
+  defineAbility(user: User, message: string) {
     const { can, cannot, build } =
       new AbilityBuilder(
         Ability as AbilityClass<AppAbility>,
