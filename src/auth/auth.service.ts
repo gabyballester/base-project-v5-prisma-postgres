@@ -10,7 +10,11 @@ import { ConfigService } from '@nestjs/config';
 import { key } from 'src/common/enum';
 import { SignInDto } from 'src/common/dto';
 import { UserService } from '../user/user.service';
-import { verifyPass } from 'src/common/functions';
+import {
+  isActive,
+  isBlocked,
+  pwMatchesVerify,
+} from 'src/common/functions';
 import { IAuthToken } from 'src/common/interfaces';
 
 @Injectable()
@@ -78,16 +82,13 @@ export class AuthService {
       throw new ForbiddenException(
         'Email not found',
       );
-
-    const pwMatches = await verifyPass(
-      user.password,
+    user && isBlocked(user); //if user has been blocked
+    user && isActive(user); // if user is still inactive
+    await pwMatchesVerify(
       dto.password,
+      user.password,
     );
 
-    if (!pwMatches)
-      throw new ForbiddenException(
-        'Password do not match',
-      );
     return this.signToken(user);
   }
 

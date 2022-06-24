@@ -11,6 +11,7 @@ CREATE TABLE "users" (
     "firstName" TEXT,
     "lastName" TEXT,
     "active" BOOLEAN NOT NULL DEFAULT false,
+    "blocked" BOOLEAN NOT NULL DEFAULT false,
     "roles" "Role"[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
