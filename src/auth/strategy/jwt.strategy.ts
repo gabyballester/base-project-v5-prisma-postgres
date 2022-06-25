@@ -11,6 +11,7 @@ import {
 import { key } from 'src/common/enum';
 import { PrismaService } from '../../prisma/prisma.service';
 import { getEnvConst } from 'src/common/functions';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(
@@ -34,7 +35,7 @@ export class JwtStrategy extends PassportStrategy(
   async validate(payload: {
     sub: number;
     email: string;
-  }) {
+  }): Promise<Omit<User, 'password'>> {
     const user =
       await this._prismaService.user.findUnique({
         where: {
@@ -44,10 +45,6 @@ export class JwtStrategy extends PassportStrategy(
     if (!user) {
       throw new UnauthorizedException();
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...restUser } = user;
-
-    return restUser;
+    return user;
   }
 }

@@ -102,11 +102,29 @@ export class UserService {
 
   async update(
     id: Prisma.UserWhereUniqueInput,
-    dto: Prisma.UserUpdateInput,
+    dto: Prisma.UserUncheckedUpdateInput,
   ) {
     await this.findOne({
       id: +id,
     });
+
+    if (
+      await this.findByEmail(dto.email.toString())
+    ) {
+      throw new BadRequestException(
+        'Email taken',
+      );
+    }
+
+    if (
+      await this.findByUsername(
+        dto.username.toString(),
+      )
+    ) {
+      throw new BadRequestException(
+        'Username taken',
+      );
+    }
 
     const userUpdated =
       await this._prismaService.user.update({

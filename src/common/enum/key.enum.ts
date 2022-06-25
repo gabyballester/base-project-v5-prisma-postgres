@@ -8,10 +8,14 @@ export enum key {
   REFRESH_TOKEN_EXPIRATION = '7d',
 }
 
-export enum AbilityAction {
+export enum Action {
   MANAGE = 'manage',
   CREATE = 'create',
   READ = 'read',
   UPDATE = 'update',
   DELETE = 'delete',
+}
+
+export enum Entity {
+  USER = 'User',
 }

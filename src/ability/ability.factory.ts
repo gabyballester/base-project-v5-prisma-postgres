@@ -3,89 +3,127 @@ import {
   AbilityBuilder,
   AbilityClass,
   ExtractSubjectType,
-  InferSubjects,
 } from '@casl/ability';
+import { Injectable } from '@nestjs/common';
 import {
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
-import { Role, User } from '@prisma/client';
-import { AbilityAction } from 'src/common/enum';
-import { UserEntity } from 'src/user/user.entity';
-import { ForbiddenError } from '@casl/ability';
+  PrismaAbility,
+  Subjects,
+} from '@casl/prisma';
+import { User } from '@prisma/client';
+import { Action, Entity } from 'src/common/enum';
+import { isAdmin } from 'src/common/functions';
 
-export type Subjects =
-  | InferSubjects<typeof UserEntity>
-  | 'all';
+type AppSubjects = Subjects<{
+  User: User;
+}>;
 
 export type AppAbility = Ability<
-  [AbilityAction, Subjects]
+  [Action, AppSubjects]
 >;
-
 @Injectable()
 export class AbilityFactory {
-  defineAbility(user: User, message: string) {
+  defineAbility(user: User) {
+    const AppAbility =
+      PrismaAbility as AbilityClass<AppAbility>;
     const { can, cannot, build } =
-      new AbilityBuilder(
-        Ability as AbilityClass<AppAbility>,
-      );
+      new AbilityBuilder(AppAbility);
 
-    if (
-      user.roles.includes(
-        Role.ADMIN || Role.SUPERADMIN,
-      )
-    ) {
-      can(AbilityAction.MANAGE, 'all');
-      // can(AbilityAction.UPDATE, UserEntity, {
-      //   id: { $ne: user.id },
-      // }).because(
-      //   'You can only manage your own user',
-      // );
-    } else {
-      can(AbilityAction.READ, UserEntity);
-      cannot(
-        AbilityAction.CREATE,
-        UserEntity,
-      ).because(message);
-      // cannot(AbilityAction.CREATE, 'all').because(
-      //   'Only admin role can create!!',
-      // );
+    if (isAdmin(user)) {
+      can(Action.MANAGE, Entity.USER);
+    }
+
+    if (!isAdmin(user)) {
+      can(Action.READ, Entity.USER);
     }
 
     return build({
       detectSubjectType: (item) =>
-        item.constructor as ExtractSubjectType<Subjects>,
+        item.constructor as unknown as ExtractSubjectType<AppSubjects>,
     });
   }
-
-  checkAbility({ entity, entityType, message }) {
-    const ability = this.defineAbility(
-      entity,
-      message,
-    );
-    // OPTION 1
-    try {
-      ForbiddenError.from(ability).throwUnlessCan(
-        AbilityAction.CREATE,
-        entityType,
-      );
-    } catch (error) {
-      if (error instanceof ForbiddenError) {
-        throw new ForbiddenException(
-          error.message,
-        );
-      }
-    }
-
-    // OPTION 2
-    // const isAllowed = ability.can(
-    //   AbilityAction.CREATE,
-    //   entityType,
-    // );
-    // if (!isAllowed) {
-    //   throw new ForbiddenException(
-    //     'Only admin!!',
-    //   );
-    // }
-  }
 }
+
+// ability.can('read', subject('User', { title: '...', authorId: 1 })));
+
+// import {
+//   Ability,
+//   InferSubjects,
+// } from '@casl/ability';
+// import { Injectable } from '@nestjs/common';
+// import { Action } from 'src/common/enum';
+// import { UserEntity } from 'src/user/user.entity';
+
+// export type Subjects =
+//   | InferSubjects<typeof UserEntity>
+//   | 'all';
+
+// export type AppAbility = Ability<
+//   [Action, Subjects]
+// >;
+
+// @Injectable()
+// export class AbilityFactory {
+// checkAbility({
+//   entity,
+//   entityType,
+//   message,
+//   dbUser,
+// }) {
+//   const ability = this.defineAbility(
+//     entity,
+//     message,
+//     dbUser,
+//   );
+// OPTION 1
+//   try {
+//     ForbiddenError.from(ability).throwUnlessCan(
+//       Action.CREATE,
+//       entityType,
+//     );
+//   } catch (error) {
+//     if (error instanceof ForbiddenError) {
+//       throw new ForbiddenException(
+//         error.message,
+//       );
+//     }
+//   }
+// OPTION 2
+// const isAllowed = ability.can(
+//   Action.CREATE,
+//   entityType,
+// );
+// if (!isAllowed) {
+//   throw new ForbiddenException(
+//     'Only admin!!',
+//   );
+// }
+// }
+// defineAbility(
+//   user: User,
+//   message: string,
+//   dbUser: User,
+// ) {
+//   console.log(user.id);
+//   console.log(dbUser.id);
+//   const { can, cannot, build } =
+//     new AbilityBuilder(
+//       Ability as AbilityClass<AppAbility>,
+//     );
+//   if (
+//     user.roles.includes(
+//       Role.ADMIN || Role.SUPERADMIN,
+//     )
+//   ) {
+//     can(Action.MANAGE, 'all');
+//   } else {
+//     cannot(
+//       Action.CREATE,
+//       UserEntity,
+//     ).because(message);
+//   }
+//   return build({
+//     detectSubjectType: (item) =>
+//       item.constructor as ExtractSubjectType<Subjects>,
+//   });
+// }
+// }
