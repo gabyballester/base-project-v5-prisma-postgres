@@ -34,6 +34,9 @@ export class AbilityFactory {
 
     if (!isAdmin(user)) {
       can(Action.READ, Entity.USER);
+      cannot(Action.CREATE, Entity.USER).because(
+        'Special message: Only admin!!',
+      );
     }
 
     return build({

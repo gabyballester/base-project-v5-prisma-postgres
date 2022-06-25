@@ -16,7 +16,8 @@ import {
 } from 'src/common/decorators';
 // import { UpdateUserDto } from 'src/common/dto/user/update-user.dto';
 import { AbilityFactory } from 'src/ability/ability.factory';
-import { Action } from 'src/common/enum';
+import { Action, Entity } from 'src/common/enum';
+import { ForbiddenError } from '@casl/ability';
 
 @Controller('users')
 export class UserController {
@@ -33,14 +34,29 @@ export class UserController {
   ) {
     const ability =
       this._abilityFactory.defineAbility(user);
-    const isAllowed = ability.can(
-      Action.CREATE,
-      'User',
-    );
-    if (!isAllowed) {
-      throw new ForbiddenException(
-        'Only admin!!',
+    // OPTION 1
+    // const isAllowed = ability.can(
+    //   Action.CREATE,
+    //   'User',
+    // );
+    // if (!isAllowed) {
+    //   throw new ForbiddenException(
+    //     'Only admin!!',
+    //   );
+    // }
+
+    // OPTION 2
+    try {
+      ForbiddenError.from(ability).throwUnlessCan(
+        Action.CREATE,
+        Entity.USER,
       );
+    } catch (error) {
+      if (error instanceof ForbiddenError) {
+        throw new ForbiddenException(
+          error.message,
+        );
+      }
     }
     return await this._userService.create(dto);
   }
