@@ -10,10 +10,16 @@ import { JwtService } from '@nestjs/jwt';
 import { Role } from '@prisma/client';
 import { Request } from 'express';
 import { key } from 'src/common/enum';
+import {
+  hasBearer,
+  isNotNull,
+} from '../functions';
 import { JwtDecodeResponse } from '../interfaces';
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class PermissionsGuard
+  implements CanActivate
+{
   constructor(
     private _reflector: Reflector,
     private _jwtService: JwtService,
@@ -24,12 +30,13 @@ export class RolesGuard implements CanActivate {
   ): Promise<any> {
     const requiredRoles =
       this._reflector.getAllAndOverride<Role[]>(
-        key.ROLES,
+        key.PERMISSIONS,
         [
           context.getHandler(),
           context.getClass(),
         ],
       );
+    console.log(requiredRoles);
 
     if (!requiredRoles) {
       return true;
@@ -39,15 +46,7 @@ export class RolesGuard implements CanActivate {
       .switchToHttp()
       .getRequest();
 
-    const hasBearer =
-      request.headers.authorization?.split(
-        'Bearer',
-      )[1];
-    if (hasBearer === undefined) {
-      throw new UnauthorizedException(
-        'Token not valid, loggin again',
-      );
-    }
+    hasBearer(request);
 
     const user = (await this._jwtService.decode(
       request.headers.authorization
@@ -55,11 +54,7 @@ export class RolesGuard implements CanActivate {
         .trim() as string,
     )) as JwtDecodeResponse;
 
-    if (user === null || !user.roles) {
-      throw new UnauthorizedException(
-        'You must be logged in (role checker2)',
-      );
-    }
+    isNotNull(user);
 
     const hasRole = () =>
       user.roles.some((role: Role) =>

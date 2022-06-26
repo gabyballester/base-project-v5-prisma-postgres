@@ -1,7 +1,7 @@
 export enum key {
   JWT_SECRET = 'JWT_SECRET',
   JWT = 'jwt',
-  ROLES = 'ROLES',
+  PERMISSIONS = 'PERMISSIONS',
   LOCAL = 'local',
   IS_PUBLIC = 'isPublic',
   ACCESS_TOKEN_EXPIRATION = '15m',
@@ -14,8 +14,4 @@ export enum Action {
   READ = 'read',
   UPDATE = 'update',
   DELETE = 'delete',
-}
-
-export enum Entity {
-  USER = 'User',
 }

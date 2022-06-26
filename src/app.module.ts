@@ -7,11 +7,11 @@ import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { JwtService } from '@nestjs/jwt';
 import {
-  RolesGuard,
+  PermissionsGuard,
   JwtAuthGuard,
   UserIntegrityGuard,
 } from 'src/common/guards';
-import { AbilityModule } from './ability/ability.module';
+import { PermissionModule } from './permission/permission.module';
 
 @Module({
   imports: [
@@ -19,14 +19,14 @@ import { AbilityModule } from './ability/ability.module';
     AuthModule,
     UserModule,
     PrismaModule,
-    AbilityModule,
+    PermissionModule,
   ],
   controllers: [],
   providers: [
     JwtService,
     {
       provide: APP_GUARD,
-      useClass: RolesGuard,
+      useClass: PermissionsGuard,
     },
     {
       provide: APP_GUARD,
