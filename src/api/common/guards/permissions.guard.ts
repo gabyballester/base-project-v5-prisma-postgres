@@ -3,7 +3,6 @@ import {
   ExecutionContext,
   ForbiddenException,
   Injectable,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
@@ -30,7 +29,7 @@ export class PermissionsGuard
   ): Promise<any> {
     const requiredRoles =
       this._reflector.getAllAndOverride<Role[]>(
-        key.PERMISSIONS,
+        key.permissions,
         [
           context.getHandler(),
           context.getClass(),

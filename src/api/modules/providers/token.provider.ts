@@ -3,10 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import { ITokenPayload } from 'src/api/common/interfaces';
-import { key } from '../../../common/enum';
+import { key } from '../../common/enum';
 
 @Injectable()
-export class JwtProvider {
+export class TokenProvider {
   constructor(
     private readonly _configService: ConfigService,
     private readonly _jwtService: JwtService,
@@ -35,7 +35,7 @@ export class JwtProvider {
   } {
     let jwtPayload: ITokenPayload;
     switch (type) {
-      case key.REFRESH_TOKEN:
+      case key.refresh_token:
         jwtPayload = {
           sub: user.id,
         };
@@ -50,7 +50,7 @@ export class JwtProvider {
     }
 
     const secret = this._configService.get(
-      key.JWT_SECRET,
+      key.jwt_secret,
     );
 
     return { jwtPayload, secret };

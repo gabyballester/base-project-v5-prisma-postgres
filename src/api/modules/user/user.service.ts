@@ -9,7 +9,7 @@ import {
 } from '@prisma/client';
 
 import { PrismaService } from 'src/api/modules/prisma/prisma.service';
-import { CryptoProvider } from '../providers/encrypt/encrypt.provider';
+import { CryptoProvider } from '../providers/crypto.provider';
 
 @Injectable()
 export class UserService {

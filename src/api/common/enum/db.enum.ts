@@ -1,3 +1,3 @@
 export enum db {
-  DATABASE_URL = 'DATABASE_URL',
+  database_url = 'DATABASE_URL',
 }

@@ -8,7 +8,7 @@ import { key } from 'src/api/common/enum';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard(
-  key.JWT,
+  key.jwt,
 ) {
   constructor(private _reflector: Reflector) {
     super();
@@ -17,7 +17,7 @@ export class JwtAuthGuard extends AuthGuard(
   canActivate(context: ExecutionContext) {
     const isPublic =
       this._reflector.getAllAndOverride<any>(
-        key.IS_PUBLIC,
+        key.is_public,
         [
           context.getHandler(),
           context.getClass(),

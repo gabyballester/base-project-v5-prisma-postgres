@@ -31,7 +31,7 @@ export class UserIntegrityGuard
   ): Promise<any> {
     const isPublic =
       this._reflector.getAllAndOverride<any>(
-        key.IS_PUBLIC,
+        key.is_public,
         [
           context.getHandler(),
           context.getClass(),

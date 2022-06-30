@@ -13,7 +13,6 @@ import {
   GetUser,
   Public,
 } from 'src/api/common/decorators';
-// import { UpdateUserDto } from 'src/common/dto/user/update-user.dto';
 
 @Controller('users')
 export class UserController {

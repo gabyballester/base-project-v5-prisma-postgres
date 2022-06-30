@@ -16,7 +16,7 @@ import { User } from '@prisma/client';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(
   Strategy,
-  getEnvConst(key.JWT),
+  getEnvConst(key.jwt),
 ) {
   constructor(
     _configService: ConfigService,
@@ -27,7 +27,7 @@ export class JwtStrategy extends PassportStrategy(
         ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
       secretOrKey: _configService.get(
-        key.JWT_SECRET,
+        key.jwt_secret,
       ),
     });
   }

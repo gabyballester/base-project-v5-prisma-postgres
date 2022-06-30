@@ -10,8 +10,8 @@ import {
   isActive,
   isBlocked,
 } from 'src/api/common/functions';
-import { CryptoProvider } from '../providers/encrypt/encrypt.provider';
-import { JwtProvider } from '../providers/jwt/jwt.provider';
+import { CryptoProvider } from '../providers/crypto.provider';
+import { TokenProvider } from '../providers/token.provider';
 import { key } from 'src/api/common/enum';
 import { IAuthToken } from '../../../../dist/api/common/interfaces/auth-token.interface';
 
@@ -20,7 +20,7 @@ export class AuthService {
   constructor(
     private readonly _prismaService: PrismaService,
     private readonly _userService: UserService,
-    private readonly _jwtProvider: JwtProvider,
+    private readonly _jwtProvider: TokenProvider,
     private readonly _cryptoProvider: CryptoProvider,
   ) {}
 
@@ -85,15 +85,15 @@ export class AuthService {
     const access_token =
       await this._jwtProvider.createToken(
         user,
-        key.ACCESS_TOKEN,
-        key.ACCESS_TOKEN_EXPIRATION,
+        key.access_token,
+        key.access_token_exp,
       );
 
     const refresh_token =
       await this._jwtProvider.createToken(
         user,
-        key.REFRESH_TOKEN,
-        key.REFRESH_TOKEN_EXPIRATION,
+        key.refresh_token,
+        key.refresh_token_exp,
       );
 
     return {
