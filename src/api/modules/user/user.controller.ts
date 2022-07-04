@@ -10,9 +10,9 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { Prisma } from '@prisma/client';
-import { Public } from 'src/api/common/decorators';
+// import { Public } from 'src/api/common/decorators';
 import { Request } from 'express';
-import { Action } from 'src/api/common/enum';
+// import { Action } from 'src/api/common/enum';
 
 @Controller('users')
 export class UserController {
@@ -31,13 +31,13 @@ export class UserController {
     );
   }
 
-  @Public()
+  // @Public()
   @Get()
   async findAll() {
     return await this._userService.findAll();
   }
 
-  @Public()
+  // @Public()
   @Get(':id')
   async findOne(
     @Param('id') id: Prisma.UserWhereUniqueInput,
@@ -49,11 +49,13 @@ export class UserController {
 
   @Put(':id')
   async update(
+    @Req() request: Request,
     @Param('id')
     id: Prisma.UserWhereUniqueInput,
     @Body() dto: Prisma.UserUncheckedUpdateInput,
   ) {
     return await this._userService.update(
+      request,
       id,
       dto,
     );

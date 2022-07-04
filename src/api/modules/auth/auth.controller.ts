@@ -8,20 +8,20 @@ import {
 import { Prisma } from '@prisma/client';
 import { AuthService } from './auth.service';
 import { SignInDto } from 'src/api/common/dto';
-import { Public } from 'src/api/common/decorators';
+// import { Public } from 'src/api/common/decorators';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private readonly _authService: AuthService,
   ) {}
-  @Public()
+  // @Public()
   @HttpCode(HttpStatus.CREATED)
   @Post('signup')
   signup(@Body() dto: Prisma.UserCreateInput) {
     return this._authService.signUp(dto);
   }
-  @Public()
+  // @Public()
   @HttpCode(HttpStatus.OK)
   @Post('signin')
   signin(@Body() dto: SignInDto) {

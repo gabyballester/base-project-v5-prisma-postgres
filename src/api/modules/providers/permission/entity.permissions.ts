@@ -1,14 +1,21 @@
 export const permConfig = {
   user: {
     superadmin: {
-      any: true,
+      manage: true,
     },
     admin: {
-      any: false,
-      create: true,
-      read: true,
+      manage: false,
+      create: {
+        all: true,
+        own: null,
+      },
+      read: {
+        all: true,
+        own: null,
+      },
       update: {
         all: true,
+        own: null,
       },
       delete: {
         all: false,
@@ -16,9 +23,12 @@ export const permConfig = {
       },
     },
     user: {
-      any: false,
+      manage: false,
       create: false,
-      read: true,
+      read: {
+        all: true,
+        own: null,
+      },
       update: {
         all: false,
         own: true,

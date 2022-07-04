@@ -2,8 +2,13 @@ import {
   forwardRef,
   Inject,
   Injectable,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { Role, User } from '@prisma/client';
+import {
+  Prisma,
+  Role,
+  User,
+} from '@prisma/client';
 import { Request } from 'express';
 import {
   isActive,
@@ -15,7 +20,10 @@ import {
 // import { hasRole } from 'src/api/common/functions/has-role.function';
 import { UserService } from '../../user/user.service';
 import { TokenProvider } from '../token.provider';
-import { Action, key } from 'src/api/common/enum';
+import {
+  Action,
+  Entity,
+} from 'src/api/common/enum';
 import { isUser } from '../../../common/functions/role-check.function';
 import { permConfig } from './entity.permissions';
 
@@ -23,6 +31,11 @@ interface IPermObj {
   entity: string;
   role: string;
   action: Action;
+}
+
+interface IRespObj {
+  status: boolean;
+  message: string;
 }
 
 @Injectable()
@@ -46,25 +59,82 @@ export class PermissionProvider {
     return userFound;
   }
 
-  getEntityPermission(permObj: IPermObj) {
+  getEntityPermission(
+    permObj: IPermObj,
+    id: Prisma.UserWhereUniqueInput,
+    user: User,
+  ) {
     const { entity, role, action } = permObj;
-    console.log(role);
 
-    const all =
-      permConfig[entity][role.toLocaleLowerCase()]
-        .any;
+    const respObj: IRespObj = {
+      status: false,
+      message: undefined,
+    };
 
-    const currentAction =
+    const permission =
       permConfig[entity][
         role.toLocaleLowerCase()
-      ][action];
+      ];
 
-    if (all) {
-      return true;
-    } else if (currentAction) {
-      return true;
+    const canManage = permission.manage;
+    let canDoAll = undefined;
+    let canDoOwn = undefined;
+
+    if (canManage) {
+      respObj.status = true;
+      respObj.message = 'Permission granted';
+      return respObj;
     } else {
-      return false;
+      canDoAll =
+        permConfig[entity][
+          role.toLocaleLowerCase()
+        ][action].all;
+    }
+
+    if (!canManage && canDoAll) {
+      respObj.status = true;
+      respObj.message = 'Permission granted';
+      return respObj;
+    } else {
+      canDoOwn =
+        permConfig[entity][
+          role.toLocaleLowerCase()
+        ][action].own;
+    }
+
+    if (!canManage && !canDoAll && canDoOwn) {
+      if (entity === Entity.user) {
+        if (id === user.id.toString()) {
+          respObj.status = true;
+          respObj.message = 'Permission granted';
+          return respObj;
+        } else {
+          respObj.message =
+            'You can only edit your own user';
+          return respObj;
+        }
+      }
+    }
+
+    if (!canManage && !canDoAll && !canDoOwn) {
+      switch (action) {
+        case Action.create:
+          respObj.message =
+            'No permission to create';
+          return respObj;
+        case Action.read:
+          respObj.message =
+            'No permission to read';
+          return respObj;
+        case Action.update:
+          respObj.message =
+            'No permission to update';
+          return respObj;
+        case Action.delete:
+          respObj.message =
+            'No permission to delete';
+          return respObj;
+      }
     }
   }
 
@@ -72,6 +142,7 @@ export class PermissionProvider {
     request: Request,
     action: Action,
     entity: string,
+    id: Prisma.UserWhereUniqueInput = undefined,
   ) {
     const dbUser = await this.getDBUserFromToken(
       request,
@@ -106,6 +177,17 @@ export class PermissionProvider {
         action,
       };
     }
-    return this.getEntityPermission(permObj);
+
+    const permResult = this.getEntityPermission(
+      permObj,
+      id,
+      dbUser,
+    );
+    if (!permResult.status) {
+      throw new UnauthorizedException(
+        permResult.message,
+      );
+    }
+    return true;
   }
 }

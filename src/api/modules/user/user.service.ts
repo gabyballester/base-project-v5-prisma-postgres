@@ -73,17 +73,11 @@ export class UserService {
     request: Request,
     dto: Prisma.UserUncheckedCreateInput,
   ): Promise<User> {
-    if (
-      !(await this._permissionProvider.checkPermission(
-        request,
-        Action.create,
-        Entity.user,
-      ))
-    ) {
-      throw new BadRequestException(
-        'Has no permission',
-      );
-    }
+    await this._permissionProvider.checkPermission(
+      request,
+      Action.create,
+      Entity.user,
+    );
 
     if (await this.findByEmail(dto.email)) {
       throw new BadRequestException(
@@ -129,12 +123,20 @@ export class UserService {
   }
 
   async update(
+    request: Request,
     id: Prisma.UserWhereUniqueInput,
     dto: Prisma.UserUncheckedUpdateInput,
   ): Promise<{
     message: string;
     data: User;
   }> {
+    await this._permissionProvider.checkPermission(
+      request,
+      Action.update,
+      Entity.user,
+      id,
+    );
+
     await this.findOne({
       id: +id,
     });
