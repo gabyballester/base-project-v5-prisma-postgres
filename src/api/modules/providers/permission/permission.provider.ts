@@ -17,7 +17,6 @@ import {
   isNotNull,
   isSuperAdmin,
 } from 'src/api/common/functions';
-// import { hasRole } from 'src/api/common/functions/has-role.function';
 import { UserService } from '../../user/user.service';
 import { TokenProvider } from '../token.provider';
 import {

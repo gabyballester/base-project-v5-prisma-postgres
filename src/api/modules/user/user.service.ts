@@ -18,6 +18,7 @@ import {
   Action,
   Entity,
 } from 'src/api/common/enum';
+import { isNotNull } from 'src/api/common/functions';
 
 @Injectable()
 export class UserService {
@@ -113,12 +114,7 @@ export class UserService {
       await this._prismaService.user.findUnique({
         where: id,
       });
-
-    if (!user) {
-      throw new BadRequestException(
-        'User does not exist',
-      );
-    }
+    isNotNull(user, 'User does not exist'); // if not exist
     return user;
   }
 
@@ -179,18 +175,18 @@ export class UserService {
 
   async remove(
     request: Request,
-    id: Prisma.UserWhereUniqueInput, //: Promise<{ //   message: string; //   data: User; // }>
-  ) {
-    await this.findOne({
-      id: +id,
-    });
-
+    id: Prisma.UserWhereUniqueInput,
+  ): Promise<{ message: string; data: User }> {
     await this._permissionProvider.checkPermission(
       request,
       Action.delete,
       Entity.user,
       id,
     );
+
+    await this.findOne({
+      id: +id,
+    });
 
     const userDeleted =
       await this._prismaService.user.delete({

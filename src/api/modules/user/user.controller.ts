@@ -12,7 +12,6 @@ import { UserService } from './user.service';
 import { Prisma } from '@prisma/client';
 // import { Public } from 'src/api/common/decorators';
 import { Request } from 'express';
-// import { Action } from 'src/api/common/enum';
 
 @Controller('users')
 export class UserController {

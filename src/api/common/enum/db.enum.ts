@@ -1,3 +1,6 @@
 export enum db {
   database_url = 'DATABASE_URL',
+  SERVER_PORT = 'SERVER_PORT',
+  SERVER_HOST = 'SERVER_HOST',
+  SERVER_VERSION = 'SERVER_VERSION',
 }
