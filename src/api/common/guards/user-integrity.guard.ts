@@ -15,6 +15,7 @@ import {
   isBlocked,
   isNotNull,
 } from '../functions';
+import { TokenProvider } from 'src/api/modules/providers/token.provider';
 
 @Injectable()
 export class UserIntegrityGuard
@@ -22,8 +23,8 @@ export class UserIntegrityGuard
 {
   constructor(
     private readonly _reflector: Reflector,
-    private readonly _jwtService: JwtService,
     private readonly _userService: UserService,
+    private _tokenProvider: TokenProvider,
   ) {}
 
   async canActivate(
@@ -47,11 +48,8 @@ export class UserIntegrityGuard
 
     hasBearer(request);
 
-    const user = (await this._jwtService.decode(
-      request.headers.authorization
-        ?.split('Bearer')[1]
-        .trim() as string,
-    )) as JwtDecodeResponse;
+    const user =
+      this._tokenProvider.decodeToken(request);
 
     isNotNull(user);
 

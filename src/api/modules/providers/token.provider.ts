@@ -1,9 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
-import { ITokenPayload } from 'src/api/common/interfaces';
+import {
+  ITokenPayload,
+  JwtDecodeResponse,
+} from 'src/api/common/interfaces';
 import { key } from '../../common/enum';
+import { Request } from 'express';
 
 @Injectable()
 export class TokenProvider {
@@ -68,5 +75,13 @@ export class TokenProvider {
         expiresIn: expiration,
       },
     );
+  }
+
+  decodeToken(request: Request) {
+    return this._jwtService.decode(
+      request.headers.authorization
+        ?.split('Bearer')[1]
+        .trim() as string,
+    ) as JwtDecodeResponse;
   }
 }

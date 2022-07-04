@@ -10,10 +10,12 @@ import {
   isActive,
   isBlocked,
 } from 'src/api/common/functions';
-import { CryptoProvider } from '../providers/crypto.provider';
-import { TokenProvider } from '../providers/token.provider';
 import { key } from 'src/api/common/enum';
-import { IAuthToken } from '../../../../dist/api/common/interfaces/auth-token.interface';
+import {
+  CryptoProvider,
+  TokenProvider,
+} from '../providers';
+import { IAuthToken } from 'src/api/common/interfaces';
 
 @Injectable()
 export class AuthService {

@@ -1,6 +1,0 @@
-** CRUD User
-
-- Create users -> ADMIN (ONLY USER ROLES), SUPERADMIN (ALL ROLES)
-- Get users / get by id -> ALL
-- Patch Users -> ONLY OWN USER OR ADMIN, SUPERADMIN
-- Delete Users -> ONLY OWN USER OR ADMIN, SUPERADMIN

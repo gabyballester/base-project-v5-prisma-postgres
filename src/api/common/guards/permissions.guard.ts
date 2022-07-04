@@ -1,69 +1,73 @@
-import {
-  CanActivate,
-  ExecutionContext,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
-import { Reflector } from '@nestjs/core';
-import { JwtService } from '@nestjs/jwt';
-import { Role } from '@prisma/client';
-import { Request } from 'express';
-import { key } from 'src/api/common/enum';
-import {
-  hasBearer,
-  isNotNull,
-} from '../functions';
-import { JwtDecodeResponse } from '../interfaces';
+// import {
+//   CanActivate,
+//   ExecutionContext,
+//   ForbiddenException,
+//   Injectable,
+// } from '@nestjs/common';
+// import { Reflector } from '@nestjs/core';
+// import { JwtService } from '@nestjs/jwt';
+// import { Role } from '@prisma/client';
+// import { Request } from 'express';
+// import { Action, key } from 'src/api/common/enum';
+// import { TokenProvider } from 'src/api/modules/providers/token.provider';
+// import {
+//   hasBearer,
+//   isNotNull,
+// } from '../functions';
+// import { hasRole } from '../functions/role-check.function';
+// import { JwtDecodeResponse } from '../interfaces';
 
-@Injectable()
-export class PermissionsGuard
-  implements CanActivate
-{
-  constructor(
-    private _reflector: Reflector,
-    private _jwtService: JwtService,
-  ) {}
+// @Injectable()
+// export class PermissionsGuard
+//   implements CanActivate
+// {
+//   constructor(
+//     private _reflector: Reflector,
 
-  async canActivate(
-    context: ExecutionContext,
-  ): Promise<any> {
-    const requiredRoles =
-      this._reflector.getAllAndOverride<Role[]>(
-        key.permissions,
-        [
-          context.getHandler(),
-          context.getClass(),
-        ],
-      );
+//     private _tokenProvider: TokenProvider,
+//   ) {}
 
-    if (!requiredRoles) {
-      return true;
-    }
+//   async canActivate(
+//     context: ExecutionContext,
+//   ): Promise<any> {
+//     const [requiredRoles, action] =
+//       this._reflector.getAllAndOverride<any>(
+//         key.permissions,
+//         [
+//           context.getHandler(),
+//           context.getClass(),
+//         ],
+//       );
 
-    const request: Request = context
-      .switchToHttp()
-      .getRequest();
+//     if (!requiredRoles) {
+//       return true;
+//     }
 
-    hasBearer(request);
+//     const request: Request = context
+//       .switchToHttp()
+//       .getRequest();
 
-    const user = (await this._jwtService.decode(
-      request.headers.authorization
-        ?.split('Bearer')[1]
-        .trim() as string,
-    )) as JwtDecodeResponse;
+//     hasBearer(request);
 
-    isNotNull(user);
+//     const user =
+//       this._tokenProvider.decodeToken(request);
 
-    const hasRole = () =>
-      user.roles.some((role: Role) =>
-        requiredRoles.includes(role),
-      );
+//     isNotNull(user);
 
-    if (!hasRole())
-      throw new ForbiddenException(
-        'Role not allowed',
-      );
+//     // if (hasRole(user, requiredRoles)) {
+//     //   return true;
+//     // } else {
+//     //   switch (action) {
+//     //     case Action.manage:
+//     //       return true;
+//     //     case Action.create:
+//     //       break;
+//     //     default:
+//     //       break;
+//     //   }
+//     // }
 
-    return user && user.roles && hasRole();
-  }
-}
+//     // return user && user.roles && hasRole();
+//     return false;
+//   }
+// }

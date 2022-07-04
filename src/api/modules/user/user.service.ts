@@ -9,13 +9,22 @@ import {
 } from '@prisma/client';
 
 import { PrismaService } from 'src/api/modules/prisma/prisma.service';
-import { CryptoProvider } from '../providers/crypto.provider';
+import {
+  CryptoProvider,
+  PermissionProvider,
+} from '../providers';
+import { Request } from 'express';
+import {
+  Action,
+  Entity,
+} from 'src/api/common/enum';
 
 @Injectable()
 export class UserService {
   constructor(
     private _prismaService: PrismaService,
     private _cryptoProvider: CryptoProvider,
+    private readonly _permissionProvider: PermissionProvider,
   ) {}
 
   async saveUserOnDatabate(
@@ -61,8 +70,21 @@ export class UserService {
   }
 
   async create(
+    request: Request,
     dto: Prisma.UserUncheckedCreateInput,
   ): Promise<User> {
+    if (
+      !(await this._permissionProvider.checkPermission(
+        request,
+        Action.create,
+        Entity.user,
+      ))
+    ) {
+      throw new BadRequestException(
+        'Has no permission',
+      );
+    }
+
     if (await this.findByEmail(dto.email)) {
       throw new BadRequestException(
         'Email taken',

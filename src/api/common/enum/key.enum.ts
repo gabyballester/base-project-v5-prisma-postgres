@@ -18,3 +18,7 @@ export enum Action {
   update = 'update',
   delete = 'delete',
 }
+
+export enum Entity {
+  user = 'user',
+}
