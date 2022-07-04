@@ -130,16 +130,16 @@ export class UserService {
     message: string;
     data: User;
   }> {
+    await this.findOne({
+      id: +id,
+    });
+
     await this._permissionProvider.checkPermission(
       request,
       Action.update,
       Entity.user,
       id,
     );
-
-    await this.findOne({
-      id: +id,
-    });
 
     if (
       await this.findByEmail(dto.email.toString())
@@ -178,14 +178,19 @@ export class UserService {
   }
 
   async remove(
-    id: Prisma.UserWhereUniqueInput,
-  ): Promise<{
-    message: string;
-    data: User;
-  }> {
+    request: Request,
+    id: Prisma.UserWhereUniqueInput, //: Promise<{ //   message: string; //   data: User; // }>
+  ) {
     await this.findOne({
       id: +id,
     });
+
+    await this._permissionProvider.checkPermission(
+      request,
+      Action.delete,
+      Entity.user,
+      id,
+    );
 
     const userDeleted =
       await this._prismaService.user.delete({

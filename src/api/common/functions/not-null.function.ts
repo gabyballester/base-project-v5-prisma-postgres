@@ -1,9 +1,10 @@
 import { UnauthorizedException } from '@nestjs/common';
 
-export const isNotNull = (prop: any) => {
+export const isNotNull = (
+  prop: any,
+  message = 'You must be logged in',
+) => {
   if (prop === null) {
-    throw new UnauthorizedException(
-      'You must be logged in',
-    );
+    throw new UnauthorizedException(message);
   }
 };

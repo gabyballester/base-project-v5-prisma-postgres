@@ -5,8 +5,6 @@ export const isAdmin = (user: User) => {
 };
 
 export const isSuperAdmin = (user: User) => {
-  console.log(user.roles);
-
   return user.roles.includes(Role.SUPERADMIN);
 };
 

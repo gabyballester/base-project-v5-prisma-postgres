@@ -63,8 +63,12 @@ export class UserController {
 
   @Delete(':id')
   async remove(
+    @Req() request: Request,
     @Param('id') id: Prisma.UserWhereUniqueInput,
   ) {
-    return await this._userService.remove(id);
+    return await this._userService.remove(
+      request,
+      id,
+    );
   }
 }

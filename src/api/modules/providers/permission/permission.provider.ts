@@ -59,10 +59,35 @@ export class PermissionProvider {
     return userFound;
   }
 
-  getEntityPermission(
+  async updateDeleteUser(
+    id: Prisma.UserWhereUniqueInput,
+    dbUser: User,
+    entity: string,
+    respObj: IRespObj,
+    action: Action,
+  ) {
+    if (entity === Entity.user) {
+      if (id === dbUser.id.toString()) {
+        respObj.status = true;
+        respObj.message = 'Permission granted';
+        return respObj;
+      } else {
+        if (Action.update === action) {
+          respObj.message =
+            'You can only edit your own user';
+        } else if (Action.delete === action) {
+          respObj.message =
+            'You can only delete your own user';
+        }
+        return respObj;
+      }
+    }
+  }
+
+  async getEntityPermission(
     permObj: IPermObj,
     id: Prisma.UserWhereUniqueInput,
-    user: User,
+    dbUser: User,
   ) {
     const { entity, role, action } = permObj;
 
@@ -103,17 +128,13 @@ export class PermissionProvider {
     }
 
     if (!canManage && !canDoAll && canDoOwn) {
-      if (entity === Entity.user) {
-        if (id === user.id.toString()) {
-          respObj.status = true;
-          respObj.message = 'Permission granted';
-          return respObj;
-        } else {
-          respObj.message =
-            'You can only edit your own user';
-          return respObj;
-        }
-      }
+      return await this.updateDeleteUser(
+        id,
+        dbUser,
+        entity,
+        respObj,
+        action,
+      );
     }
 
     if (!canManage && !canDoAll && !canDoOwn) {
@@ -155,22 +176,18 @@ export class PermissionProvider {
     };
 
     if (isSuperAdmin(dbUser)) {
-      console.log('entra en isSuperAdmin');
       permObj = {
         entity,
         role: Role.SUPERADMIN.toLocaleLowerCase(),
         action,
       };
     } else if (isAdmin(dbUser)) {
-      console.log('entra en isAdmin');
-
       permObj = {
         entity,
         role: Role.ADMIN.toLocaleLowerCase(),
         action,
       };
     } else if (isUser(dbUser)) {
-      console.log('entra en isUser');
       permObj = {
         entity,
         role: Role.USER.toLocaleLowerCase(),
@@ -178,11 +195,12 @@ export class PermissionProvider {
       };
     }
 
-    const permResult = this.getEntityPermission(
-      permObj,
-      id,
-      dbUser,
-    );
+    const permResult =
+      await this.getEntityPermission(
+        permObj,
+        id,
+        dbUser,
+      );
     if (!permResult.status) {
       throw new UnauthorizedException(
         permResult.message,

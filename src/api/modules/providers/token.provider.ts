@@ -11,6 +11,7 @@ import {
 } from 'src/api/common/interfaces';
 import { key } from '../../common/enum';
 import { Request } from 'express';
+import { hasBearer } from 'src/api/common/functions';
 
 @Injectable()
 export class TokenProvider {
@@ -78,6 +79,7 @@ export class TokenProvider {
   }
 
   decodeToken(request: Request) {
+    hasBearer(request);
     return this._jwtService.decode(
       request.headers.authorization
         ?.split('Bearer')[1]

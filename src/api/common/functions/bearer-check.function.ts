@@ -8,7 +8,7 @@ export const hasBearer = (request: Request) => {
     )[1] === undefined
   ) {
     throw new UnauthorizedException(
-      'Token not valid, try to login again',
+      'Session has expired, try to login again',
     );
   }
 };

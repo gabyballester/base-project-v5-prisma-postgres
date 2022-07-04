@@ -9,6 +9,7 @@ import { UserService } from '../user/user.service';
 import {
   isActive,
   isBlocked,
+  isNotNull,
 } from 'src/api/common/functions';
 import { key } from 'src/api/common/enum';
 import {
@@ -70,9 +71,10 @@ export class AuthService {
           email: dto.email,
         },
       });
+    isNotNull(user, 'User does not exist'); // if not exist
+    isBlocked(user); //if user has been blocked
+    isActive(user); // if user is still inactive
 
-    user && isBlocked(user); //if user has been blocked
-    user && isActive(user); // if user is still inactive
     this._cryptoProvider.verifyPass(
       dto.password,
       user.password,
